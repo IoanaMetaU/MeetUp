@@ -1,5 +1,6 @@
 package com.example.meetup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,6 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private GoogleSignInAccount account;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +47,13 @@ public class SignUpActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         passwordAgain = findViewById(R.id.passwordagain);
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            account = intent.getParcelableExtra("account");
-            if (account != null)
-                username.setText(account.getDisplayName());
+        if (savedInstanceState == null) {
+            Intent intent = getIntent();
+            if (intent != null) {
+                account = intent.getParcelableExtra("account");
+                if (account != null)
+                    username.setText(account.getDisplayName());
+            }
         }
 
         signUp.setOnClickListener(v -> {
@@ -61,6 +65,12 @@ public class SignUpActivity extends AppCompatActivity {
 
         back.setOnClickListener(v -> finish());
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        savedInstanceState.putAll(savedInstanceState);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     private void signUp(String username, String password) {

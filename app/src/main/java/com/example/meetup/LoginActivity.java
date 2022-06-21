@@ -33,9 +33,9 @@ public class LoginActivity extends AppCompatActivity {
     private Button login;
     private Button navigateSignup;
     private ProgressDialog progressDialog;
-    public static final int RC_SIGN_IN = 7;
-    GoogleSignInClient mGoogleSignInClient;
-    public static final String TAG = "LoginActivity";
+    private static final int RC_SIGN_IN = 7;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final String TAG = "LoginActivity";
 
 
     @Override
@@ -60,9 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         SignInButton googleSignIn = findViewById(R.id.sign_in_button);
 
         Objects.requireNonNull(googleSignIn).setOnClickListener(v -> {
-            if (v.getId() == R.id.sign_in_button) {
-                signIn();
-            }
+            signInWithGoogle();
         });
     }
 
@@ -111,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void signIn() {
+    private void signInWithGoogle() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
