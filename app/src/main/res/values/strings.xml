@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MeetUp</string>
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+
+    <!-- Paste BOTH strings as required -->
+    <string name="back4app_app_id">aK11xcXEAi1zbajpTG7j4wnqrNHvVlGTgFtNtAyG</string>
+    <string name="back4app_client_key">rG93T3jCFVbl7rIEG4yaCNzqd0is9aojeV8xIz7z</string>
 </resources>
