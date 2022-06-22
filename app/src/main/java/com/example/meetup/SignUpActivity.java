@@ -82,30 +82,11 @@ public class SignUpActivity extends AppCompatActivity {
         user.signUpInBackground(e -> {
             progressDialog.dismiss();
             if (e == null) {
-                showAlert("Successful Sign Up ! You logged in...\n", "Welcome " + username + " !");
+                Utils.showAlert("Successful Sign Up ! You logged in...\n", "Welcome " + username + " !", SignUpActivity.this, LogoutActivity.class);
             } else {
                 ParseUser.logOut();
                 Toast.makeText(SignUpActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-
-    private void showAlert(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        // don't forget to change the line below with the names of your Activities
-                        Intent intent = new Intent(SignUpActivity.this, LogoutActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
-        AlertDialog ok = builder.create();
-        ok.show();
     }
 }

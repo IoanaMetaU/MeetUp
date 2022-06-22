@@ -17,7 +17,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 public class LogoutActivity extends AppCompatActivity {
-    Button logout;
+    private Button logout;
     private ProgressDialog progressDialog;
 
     @Override

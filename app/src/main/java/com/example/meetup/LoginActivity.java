@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button navigateSignup;
     private ProgressDialog progressDialog;
     private static final int RC_SIGN_IN = 7;
-    private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInClient googleSignInClient;
     private static final String TAG = "LoginActivity";
 
 
@@ -70,29 +70,13 @@ public class LoginActivity extends AppCompatActivity {
         ParseUser.logInInBackground(username, password, (parseUser, e) -> {
             progressDialog.dismiss();
             if (parseUser != null) {
-                showAlert("Successful Login", "Welcome back " + username + " !");
+                Utils.showAlert("Successful Login", "Welcome back " + username + " !", LoginActivity.this, LogoutActivity.class);
+                runOnUiThread(this::goMainActivity);
             } else {
                 ParseUser.logOut();
                 Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void showAlert(String title,String message){
-        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        Intent intent = new Intent(LoginActivity.this, LogoutActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-                });
-        AlertDialog ok = builder.create();
-        ok.show();
     }
 
     private void setUpGoogleSignIn() {
@@ -101,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
@@ -110,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        Intent signInIntent = googleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -133,14 +117,15 @@ public class LoginActivity extends AppCompatActivity {
             intent.putExtra("account", account);
             startActivity(intent);
         } catch (ApiException e) {
+            // Exception e.getStatusCode();
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
         }
     }
 
     private void goMainActivity() {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
         finish();
     }
 }
