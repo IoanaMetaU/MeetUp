@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_home"
+        android:enabled="true"
+        android:icon="@drawable/icons8_home_24"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_compose"
+        android:enabled="true"
+        android:icon="@drawable/icons8_create_24"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_search"
+        android:enabled="true"
+        android:icon="@drawable/icons8_search_24"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_maps"
+        android:enabled="true"
+        android:icon="@drawable/icons8_google_maps_24"
+        app:showAsAction="ifRoom" />
+</menu>
