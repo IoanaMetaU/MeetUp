@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.meetup.Fragments.ComposeFragment;
+import com.example.meetup.Fragments.FeedFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
 
@@ -28,22 +30,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment = null;
-//                switch (item.getItemId()) {
-//                    case R.id.action_home:
-//                        fragment = new FeedFragment();
-//                        break;
-//                    case R.id.action_compose:
-//                        fragment = new ComposeFragment();
-//                        break;
+                switch (item.getItemId()) {
+                    case R.id.action_home:
+                        fragment = new FeedFragment();
+                        break;
+                    case R.id.action_compose:
+                        fragment = new ComposeFragment();
+                        break;
+//                    TODO create maps/search
 //                    case R.id.action_maps:
 //                        fragment = new MapsFragment();
 //                        break;
 //                    case R.id.action_search:
 //                        fragment = new SearchFragment();
 //                        break;
-//                    default: fragment = new SearchFragment();
-//                }
-//                fragmentManager.beginTransaction().replace(R.id.fragmentPlaceholder, fragment).commit();
+                    default: fragment = new FeedFragment();
+                }
+                fragmentManager.beginTransaction().replace(R.id.fragmentPlaceholder, fragment).commit();
                 return true;
             }
         });
