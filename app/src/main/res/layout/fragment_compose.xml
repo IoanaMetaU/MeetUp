@@ -76,23 +76,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="154dp"
-            android:layout_marginTop="44dp"
+            android:layout_marginTop="111dp"
             android:layout_marginEnd="166dp"
             android:text="submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/logoCompose" />
+            app:layout_constraintTop_toBottomOf="@+id/uploadImageCompose" />
 
-        <ImageView
-            android:id="@+id/logoCompose"
+        <Button
+            android:id="@+id/uploadImageCompose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="137dp"
-            android:layout_marginTop="22dp"
-            android:layout_marginEnd="146dp"
+            android:layout_marginStart="135dp"
+            android:layout_marginTop="35dp"
+            android:layout_marginEnd="129dp"
+            android:text="upload image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionCompose"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toBottomOf="@+id/descriptionCompose" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
