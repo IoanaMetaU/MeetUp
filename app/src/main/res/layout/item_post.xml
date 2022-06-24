@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_marginStart="19dp"
         android:layout_marginTop="19dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,8 +19,8 @@
         android:id="@+id/startupName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="23dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="24dp"
         android:text="startupName"
         app:layout_constraintStart_toEndOf="@+id/logo"
         app:layout_constraintTop_toTopOf="parent" />
@@ -29,8 +29,8 @@
         android:id="@+id/founderUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="by @founderUsername"
-        app:layout_constraintStart_toStartOf="@+id/startupName"
+        android:text="founderUsername"
+        app:layout_constraintStart_toEndOf="@+id/by"
         app:layout_constraintTop_toBottomOf="@+id/startupName" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="category"
-        app:layout_constraintStart_toStartOf="@+id/founderUsername"
+        app:layout_constraintStart_toStartOf="@+id/by"
         app:layout_constraintTop_toBottomOf="@+id/founderUsername" />
 
     <TextView
@@ -65,6 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="21dp"
+        android:layout_marginEnd="21dp"
         android:text="description"
         app:layout_constraintStart_toStartOf="@+id/caption"
         app:layout_constraintTop_toBottomOf="@+id/caption" />
@@ -77,5 +78,13 @@
         android:text="roles"
         app:layout_constraintStart_toStartOf="@+id/description"
         app:layout_constraintTop_toBottomOf="@+id/description" />
+
+    <TextView
+        android:id="@+id/by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="by @"
+        app:layout_constraintStart_toStartOf="@+id/startupName"
+        app:layout_constraintTop_toBottomOf="@+id/startupName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

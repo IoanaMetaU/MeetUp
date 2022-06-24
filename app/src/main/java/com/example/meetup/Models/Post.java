@@ -54,7 +54,7 @@ public class Post extends ParseObject {
     }
 
     public void setCaption(String caption) {
-        put(KEY_DESCRIPTION, caption);
+        put(KEY_CAPTION, caption);
     }
 
     public String getStartupName() {
@@ -62,7 +62,7 @@ public class Post extends ParseObject {
     }
 
     public void setStartupName(String startupName) {
-        put(KEY_DESCRIPTION, startupName);
+        put(KEY_STARTUP_NAME, startupName);
     }
 
     public String getCategory() {
@@ -70,7 +70,7 @@ public class Post extends ParseObject {
     }
 
     public void setCategory(String category) {
-        put(KEY_DESCRIPTION, category);
+        put(KEY_CATEGORY, category);
     }
 
 

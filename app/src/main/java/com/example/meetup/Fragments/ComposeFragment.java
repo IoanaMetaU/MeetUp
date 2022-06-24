@@ -133,7 +133,7 @@ public class ComposeFragment extends Fragment {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            photoFile = bitmapToFile(getContext(), pictureBitmap, "image.png");
+            photoFile = bitmapToFile(getContext(), pictureBitmap, "image.jpeg");
         }
     }
 
@@ -141,7 +141,9 @@ public class ComposeFragment extends Fragment {
         //create a file to write bitmap data
         File file = null;
         try {
-            file = new File(Environment.getExternalStorageDirectory() + File.separator + fileNameToSave);
+            // use cache to store image
+            file = new File(context.getCacheDir(), fileNameToSave);
+
             file.createNewFile();
 
             //Convert bitmap to byte array
@@ -161,28 +163,43 @@ public class ComposeFragment extends Fragment {
         }
     }
 
-    private void savePost(String startupName, String description, String caption, String category, ParseUser currentUser, File photoFile) {
+    private void savePost(String startupName, String description, String caption, String category, ParseUser currentUser, File photoFile){
         Post post = new Post();
         post.setStartupName(startupName);
         post.setCaption(caption);
         post.setDescription(description);
         post.setCategory(category);
         post.setUser(currentUser);
-        post.setImage(new ParseFile(this.photoFile));
-        post.saveInBackground(new SaveCallback() {
+        ParseFile image = new ParseFile(photoFile);
+        image.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "error while saving", e);
-                    Toast.makeText(getContext(), "error while saving", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "error while saving image", e);
+                    Toast.makeText(getContext(), "error while saving image", Toast.LENGTH_SHORT).show();
                 }
-                Log.i(TAG, "post save was successful");
-                startupNameCompose.setText("");
-                categoryCompose.setText("");
-                captionCompose.setText("");
-                descriptionCompose.setText("");
-                // TODO set logo image
+                Log.i(TAG, "image saved");
+                post.setImage(image);
+
+                // save post after saving image has finished
+                post.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e != null) {
+                            Log.e(TAG, "error while saving", e);
+                            Toast.makeText(getContext(), "error while saving", Toast.LENGTH_SHORT).show();
+                        }
+                        Log.i(TAG, "post save was successful");
+                        startupNameCompose.setText("");
+                        categoryCompose.setText("");
+                        captionCompose.setText("");
+                        descriptionCompose.setText("");
+                        // TODO set logo image
+                    }
+                });
             }
         });
+
+
     }
 }
