@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         ParseUser.logInInBackground(username, password, (parseUser, e) -> {
             progressDialog.dismiss();
             if (parseUser != null) {
-                Utils.showAlert("Successful Login", "Welcome back " + username + " !", LoginActivity.this, LogoutActivity.class);
+                Utils.showAlert("Successful Login", "Welcome back " + username + " !", LoginActivity.this, MainActivity.class);
                 runOnUiThread(this::goMainActivity);
             } else {
                 ParseUser.logOut();
