@@ -18,6 +18,9 @@
         android:theme="@style/Theme.MeetUp"
         tools:targetApi="31">
         <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".LogoutActivity"
             android:exported="false" />
         <activity
@@ -34,8 +37,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"></activity>
 
         <meta-data
             android:name="com.parse.SERVER_URL"
@@ -46,6 +48,16 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
+
+<!--        <fragment android:name=".SearchActivity">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.SEARCH" />-->
+<!--            </intent-filter>-->
+
+<!--            <meta-data-->
+<!--                android:name="android.app.searchable"-->
+<!--                android:resource="@xml/searchable" />-->
+<!--        </fragment>-->
     </application>
 
 </manifest>

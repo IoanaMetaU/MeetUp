@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.example.meetup.Fragments.ComposeFragment;
 import com.example.meetup.Fragments.FeedFragment;
+import com.example.meetup.Fragments.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
 
@@ -41,9 +42,9 @@ public class MainActivity extends AppCompatActivity {
 //                    case R.id.action_maps:
 //                        fragment = new MapsFragment();
 //                        break;
-//                    case R.id.action_search:
-//                        fragment = new SearchFragment();
-//                        break;
+                    case R.id.action_search:
+                        fragment = new SearchFragment();
+                        break;
                     default: fragment = new FeedFragment();
                 }
                 fragmentManager.beginTransaction().replace(R.id.fragmentPlaceholder, fragment).commit();
