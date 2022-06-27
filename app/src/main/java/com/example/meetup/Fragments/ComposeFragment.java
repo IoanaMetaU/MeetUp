@@ -156,10 +156,11 @@ public class ComposeFragment extends Fragment {
             fos.write(bitmapdata);
             fos.flush();
             fos.close();
-            return file;
         }catch (Exception e){
             e.printStackTrace();
-            return file; // it will return null
+        }
+        finally {
+            return file;
         }
     }
 

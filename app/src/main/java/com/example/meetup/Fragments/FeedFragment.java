@@ -27,10 +27,10 @@ public class FeedFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
 
-    protected RecyclerView posts;
+    private RecyclerView posts;
 
-    public PostsAdapter adapter;
-    public List<Post> allPosts;
+    private PostsAdapter adapter;
+    private List<Post> allPosts;
 
     private SwipeRefreshLayout swipeContainer;
     private EndlessRecyclerViewScrollListener scrollListener;
