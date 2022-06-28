@@ -4,17 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,15 +20,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -40,9 +34,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ComposeFragment extends Fragment {
     private static final String TAG = "ComposeFragment";
@@ -55,8 +46,8 @@ public class ComposeFragment extends Fragment {
     private EditText descriptionCompose;
     private Button uploadImageCompose;
     private File photoFile;
-//    private ImageView logo;
-//    TODO make it list of roles private TextView roles;
+    private ImageView logoCompose;
+    private EditText rolesCompose;
 
     private Button submitCompose;
 
@@ -76,7 +67,7 @@ public class ComposeFragment extends Fragment {
     // This event is triggered soon after onCreateView().
     // Any view setup should occur here.  E.g., view lookups and attaching view listeners.
     @Override
-    public void onViewCreated(@NonNull  View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         startupNameCompose = view.findViewById(R.id.startupNameCompose);
         categoryCompose = view.findViewById(R.id.categoryCompose);
@@ -88,6 +79,7 @@ public class ComposeFragment extends Fragment {
         submitCompose = view.findViewById(R.id.submit);
         constraintLayoutCompose = view.findViewById(R.id.constraintLayoutCompose);
         uploadImageCompose = view.findViewById(R.id.uploadImageCompose);
+        logoCompose = view.findViewById(R.id.logoCompose);
 
         uploadImageCompose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,7 +113,7 @@ public class ComposeFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //Detects request codes
-        if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
             Bitmap pictureBitmap = null;
             try {
@@ -133,6 +125,7 @@ public class ComposeFragment extends Fragment {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            logoCompose.setImageBitmap(pictureBitmap);
             photoFile = bitmapToFile(getContext(), pictureBitmap, "image.jpeg");
         }
     }
@@ -148,7 +141,7 @@ public class ComposeFragment extends Fragment {
 
             //Convert bitmap to byte array
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 0 , bos); // YOU can also save it in JPEG
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, bos); // YOU can also save it in JPEG
             byte[] bitmapdata = bos.toByteArray();
 
             //write the bytes in file
@@ -156,15 +149,14 @@ public class ComposeFragment extends Fragment {
             fos.write(bitmapdata);
             fos.flush();
             fos.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             return file;
         }
     }
 
-    private void savePost(String startupName, String description, String caption, String category, ParseUser currentUser, File photoFile){
+    private void savePost(String startupName, String description, String caption, String category, ParseUser currentUser, File photoFile) {
         Post post = new Post();
         post.setStartupName(startupName);
         post.setCaption(caption);
@@ -195,7 +187,8 @@ public class ComposeFragment extends Fragment {
                         categoryCompose.setText("");
                         captionCompose.setText("");
                         descriptionCompose.setText("");
-                        // TODO set logo image
+                        rolesCompose.setText("");
+                        logoCompose.setImageResource(0);
                     }
                 });
             }

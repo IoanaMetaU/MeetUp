@@ -1,6 +1,7 @@
 package com.example.meetup.Fragments;
 
 import static com.example.meetup.Models.Post.KEY_STARTUP_NAME;
+import static com.example.meetup.Models.Post.KEY_USER;
 
 import android.app.SearchManager;
 import android.content.Intent;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.SearchView;
 
 import com.example.meetup.Adapters.PostsAdapter;
@@ -24,7 +27,9 @@ import com.example.meetup.EndlessRecyclerViewScrollListener;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -39,7 +44,11 @@ public class SearchFragment extends Fragment {
     private PostsAdapter adapter;
     private List<Post> allPosts;
 
-    private SearchView searchName;
+    private EditText searchName;
+    private EditText searchCategory;
+    private EditText searchKeyWord;
+    private EditText searchRole;
+    private Button searchFind;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -55,6 +64,10 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         searchName = view.findViewById(R.id.searchName);
+        searchCategory = view.findViewById(R.id.searchCategory);
+        searchKeyWord = view.findViewById(R.id.searchKeyWord);
+        searchRole = view.findViewById(R.id.searchRole);
+        searchFind = view.findViewById(R.id.searchFind);
 
         posts = view.findViewById(R.id.posts);
         allPosts = new ArrayList<>();
@@ -63,27 +76,45 @@ public class SearchFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         posts.setLayoutManager(llm);
 
-        searchName.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchFind.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                String searchNameQuery = searchName.getQuery().toString();
-                Log.i(TAG, searchNameQuery);
-                queryPosts(searchNameQuery);
-                return false;
+            public void onClick(View v) {
+                String searchNameQuery = searchName.getText().toString();
+                String searchCategoryQuery = searchCategory.getText().toString();
+                String searchKeyWordQuery = searchKeyWord.getText().toString();
+                String searchRoleQuery = searchRole.getText().toString();
+                queryPosts(searchNameQuery, searchCategoryQuery, searchKeyWordQuery, searchRoleQuery);
             }
         });
     }
 
-    private void queryPosts(String searchName) {
-        // specify which class to query
+    private void queryPosts(String searchName, String searchCategory, String searchKeyWord, String searchRole) {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.whereEqualTo(Post.KEY_STARTUP_NAME, searchName);
+        // search for key work both in short caption and description
+        // if the key word appears in any of them, add to query result
+        if (searchKeyWord != null && searchKeyWord.length() > 0) {
+            //query.whereContains(Post.KEY_DESCRIPTION, searchKeyWord);
+            ParseQuery<Post> queryCaption = ParseQuery.getQuery(Post.class);
+            queryCaption.whereContains(Post.KEY_CAPTION, searchKeyWord);
+            ParseQuery<Post> queryDescription = ParseQuery.getQuery(Post.class);
+            queryDescription.whereContains(Post.KEY_DESCRIPTION, searchKeyWord);
+
+            List<ParseQuery<Post>> queries = new ArrayList<ParseQuery<Post>>();
+            queries.add(queryCaption);
+            queries.add(queryDescription);
+
+             query = ParseQuery.or(queries);
+             query.include(Post.KEY_USER);
+        }
+        if (searchName != null && searchName.length() > 0)
+            query.whereEqualTo(Post.KEY_STARTUP_NAME, searchName);
+        if (searchCategory != null && searchCategory.length() > 0)
+            query.whereEqualTo(Post.KEY_CATEGORY, searchCategory);
+//        TODO implement roles
+//        if (searchRole != null)
+//            query.whereContains(Post.KEY_ROLE, searchRole);
+
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
