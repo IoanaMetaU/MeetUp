@@ -80,6 +80,7 @@ public class ComposeFragment extends Fragment {
         constraintLayoutCompose = view.findViewById(R.id.constraintLayoutCompose);
         uploadImageCompose = view.findViewById(R.id.uploadImageCompose);
         logoCompose = view.findViewById(R.id.logoCompose);
+        rolesCompose = view.findViewById(R.id.rolesCompose);
 
         uploadImageCompose.setOnClickListener(new View.OnClickListener() {
             @Override

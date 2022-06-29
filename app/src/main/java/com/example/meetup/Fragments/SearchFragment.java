@@ -84,6 +84,11 @@ public class SearchFragment extends Fragment {
                 String searchKeyWordQuery = searchKeyWord.getText().toString();
                 String searchRoleQuery = searchRole.getText().toString();
                 queryPosts(searchNameQuery, searchCategoryQuery, searchKeyWordQuery, searchRoleQuery);
+
+                searchName.setText("");
+                searchCategory.setText("");
+                searchKeyWord.setText("");
+                searchRole.setText("");
             }
         });
     }
@@ -111,9 +116,8 @@ public class SearchFragment extends Fragment {
             query.whereEqualTo(Post.KEY_STARTUP_NAME, searchName);
         if (searchCategory != null && searchCategory.length() > 0)
             query.whereEqualTo(Post.KEY_CATEGORY, searchCategory);
-//        TODO implement roles
-//        if (searchRole != null)
-//            query.whereContains(Post.KEY_ROLE, searchRole);
+        if (searchRole != null && searchRole.length() > 0)
+            query.whereContains(Post.KEY_ROLES, searchRole);
 
         query.findInBackground(new FindCallback<Post>() {
             @Override

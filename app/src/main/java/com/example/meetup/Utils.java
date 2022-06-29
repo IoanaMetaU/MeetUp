@@ -21,6 +21,9 @@ public class Utils {
                     }
                 });
         AlertDialog ok = builder.create();
-        ok.show();
+        if(!((MainActivity) context).isFinishing())
+        {
+            ok.show();
+        }
     }
 }
