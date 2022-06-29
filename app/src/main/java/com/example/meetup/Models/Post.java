@@ -24,6 +24,7 @@ public class Post extends ParseObject {
     public static final String KEY_CAPTION = "caption";
     public static final String KEY_STARTUP_NAME = "startup_name";
     public static final String KEY_CATEGORY = "category";
+    public static final String KEY_ROLES = "roles";
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
@@ -73,8 +74,11 @@ public class Post extends ParseObject {
         put(KEY_CATEGORY, category);
     }
 
+    public String getRoles() {
+        return getString(KEY_ROLES);
+    }
 
-
+    public void setRoles(String roles) { put(KEY_ROLES, roles);}
 
 
     public static String calculateTimeAgo(Date createdAt) {
