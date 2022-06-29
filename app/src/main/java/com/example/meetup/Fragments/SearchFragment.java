@@ -1,10 +1,5 @@
 package com.example.meetup.Fragments;
 
-import static com.example.meetup.Models.Post.KEY_STARTUP_NAME;
-import static com.example.meetup.Models.Post.KEY_USER;
-
-import android.app.SearchManager;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,24 +7,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SearchView;
 
 import com.example.meetup.Adapters.PostsAdapter;
-import com.example.meetup.EndlessRecyclerViewScrollListener;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
@@ -44,7 +37,7 @@ public class SearchFragment extends Fragment {
     private PostsAdapter adapter;
     private List<Post> allPosts;
 
-    private EditText searchName;
+    private AutoCompleteTextView searchName;
     private EditText searchCategory;
     private EditText searchKeyWord;
     private EditText searchRole;
@@ -68,6 +61,14 @@ public class SearchFragment extends Fragment {
         searchKeyWord = view.findViewById(R.id.searchKeyWord);
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
+
+
+        String[] startupNames = getColumnArray(Post.KEY_STARTUP_NAME).toArray(new String[0]);
+        Log.i(TAG, startupNames.toString());
+        String[] ss = {"aa", "bb"};
+        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, ss);
+        searchName.setAdapter(searchNameAdapter);
+        searchName.setThreshold(1);
 
         posts = view.findViewById(R.id.posts);
         allPosts = new ArrayList<>();
@@ -136,4 +137,26 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    // TODO fix currently returned array is empty
+    private ArrayList<String> getColumnArray(String columnName) {
+        ArrayList columnArray = new ArrayList<String>();
+        ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
+        query.include(Post.KEY_USER);
+        query.addAscendingOrder(columnName);
+        query.findInBackground(new FindCallback<Post>() {
+            @Override
+            public void done(List<Post> posts, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "issue getting " + columnName);
+                }
+                if (posts.size() > 0) {
+                    for (Post post : posts)
+                        // TODO replace getstartup name with function
+                        columnArray.add(post.getStartupName());
+                }
+            }
+        });
+
+        return columnArray;
+    }
 }

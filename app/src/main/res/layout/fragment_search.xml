@@ -14,16 +14,6 @@
         app:layout_constraintTop_toBottomOf="@+id/searchFind" />
 
     <EditText
-        android:id="@+id/searchName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="name"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
         android:id="@+id/searchCategory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,5 +56,14 @@
         android:minHeight="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchKeyWord" />
+
+    <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/searchName"
+        android:layout_width="208dp"
+        android:layout_height="42dp"
+        android:hint="name"
+        android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
