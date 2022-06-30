@@ -38,12 +38,14 @@ public class SearchFragment extends Fragment {
     private List<Post> allPosts;
 
     private AutoCompleteTextView searchName;
-    private EditText searchCategory;
+    private AutoCompleteTextView searchCategory;
     private EditText searchKeyWord;
     private EditText searchRole;
     private Button searchFind;
 
     private ArrayList<String> startupNames;
+    private ArrayList<String> categories;
+
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -67,28 +69,7 @@ public class SearchFragment extends Fragment {
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
 
-        startupNames = new ArrayList<String>();
-        // final String[] dataArray = new String[0];
-        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames);
-
-        getColumnArray(new Function() {
-            @Override
-            public void onCalled(List<Post> postsList) {
-                Log.i(TAG, String.valueOf(postsList.size()));
-                startupNames.clear();
-                for (Post post : postsList) {
-                    Log.i(TAG, post.getStartupName());
-                    startupNames.add(post.getStartupName());
-                }
-                searchNameAdapter.notifyDataSetChanged();
-                Log.i(TAG, startupNames.toString());
-                // String[] ss = {"aa", "bb"};
-                // ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames.toArray(new String[0]));
-            }
-        });
-
-        searchName.setAdapter(searchNameAdapter);
-        searchName.setThreshold(1);
+        setupAutocomplete();
 
         posts = view.findViewById(R.id.posts);
         allPosts = new ArrayList<>();
@@ -112,6 +93,36 @@ public class SearchFragment extends Fragment {
                 searchRole.setText("");
             }
         });
+    }
+
+    public void setupAutocomplete() {
+        startupNames = new ArrayList<String>();
+        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames);
+
+        categories = new ArrayList<String>();
+        ArrayAdapter<String> searchCategoriesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, categories);
+
+        getColumnArray(new Function() {
+            @Override
+            public void onCalled(List<Post> postsList) {
+                startupNames.clear();
+                categories.clear();
+                for (Post post : postsList) {
+                    if (!startupNames.contains(post.getStartupName()))
+                        startupNames.add(post.getStartupName());
+                    if (!categories.contains(post.getCategory()))
+                        categories.add(post.getCategory());
+                }
+                searchNameAdapter.notifyDataSetChanged();
+                searchCategoriesAdapter.notifyDataSetChanged();
+            }
+        });
+
+        searchName.setAdapter(searchNameAdapter);
+        searchName.setThreshold(1);
+
+        searchCategory.setAdapter(searchCategoriesAdapter);
+        searchCategory.setThreshold(1);
     }
 
     private void queryPosts(String searchName, String searchCategory, String searchKeyWord, String searchRole) {
@@ -157,20 +168,15 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    // TODO fix currently returned array is empty
     private void getColumnArray(Function callback) {
-
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-//        query.addAscendingOrder(columnName);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "issue getting ");
+                    Log.e(TAG, "issue getting posts");
                 }
-                Log.i(TAG, "iterates over post");
-                Log.i(TAG, String.valueOf(posts.size()));
                 if (posts.size() > 0) {
                     callback.onCalled(posts);
                 }
