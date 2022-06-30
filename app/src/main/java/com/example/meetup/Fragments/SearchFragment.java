@@ -43,8 +43,13 @@ public class SearchFragment extends Fragment {
     private EditText searchRole;
     private Button searchFind;
 
+    private ArrayList<String> startupNames;
     public SearchFragment() {
         // Required empty public constructor
+    }
+
+    interface Function {
+        public void onCalled(List<Post> posts);
     }
 
     @Override
@@ -62,11 +67,26 @@ public class SearchFragment extends Fragment {
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
 
+        startupNames = new ArrayList<String>();
+        // final String[] dataArray = new String[0];
+        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames);
 
-        String[] startupNames = getColumnArray(Post.KEY_STARTUP_NAME).toArray(new String[0]);
-        Log.i(TAG, startupNames.toString());
-        String[] ss = {"aa", "bb"};
-        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, ss);
+        getColumnArray(new Function() {
+            @Override
+            public void onCalled(List<Post> postsList) {
+                Log.i(TAG, String.valueOf(postsList.size()));
+                startupNames.clear();
+                for (Post post : postsList) {
+                    Log.i(TAG, post.getStartupName());
+                    startupNames.add(post.getStartupName());
+                }
+                searchNameAdapter.notifyDataSetChanged();
+                Log.i(TAG, startupNames.toString());
+                // String[] ss = {"aa", "bb"};
+                // ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames.toArray(new String[0]));
+            }
+        });
+
         searchName.setAdapter(searchNameAdapter);
         searchName.setThreshold(1);
 
@@ -138,25 +158,23 @@ public class SearchFragment extends Fragment {
     }
 
     // TODO fix currently returned array is empty
-    private ArrayList<String> getColumnArray(String columnName) {
-        ArrayList columnArray = new ArrayList<String>();
+    private void getColumnArray(Function callback) {
+
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
-        query.addAscendingOrder(columnName);
+//        query.addAscendingOrder(columnName);
         query.findInBackground(new FindCallback<Post>() {
             @Override
             public void done(List<Post> posts, ParseException e) {
                 if (e != null) {
-                    Log.e(TAG, "issue getting " + columnName);
+                    Log.e(TAG, "issue getting ");
                 }
+                Log.i(TAG, "iterates over post");
+                Log.i(TAG, String.valueOf(posts.size()));
                 if (posts.size() > 0) {
-                    for (Post post : posts)
-                        // TODO replace getstartup name with function
-                        columnArray.add(post.getStartupName());
+                    callback.onCalled(posts);
                 }
             }
         });
-
-        return columnArray;
     }
 }
