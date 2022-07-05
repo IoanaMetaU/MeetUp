@@ -41,12 +41,18 @@ public class SearchFragment extends Fragment {
     private AutoCompleteTextView searchName;
     private AutoCompleteTextView searchCategory;
     private AutoCompleteTextView searchRole;
-    private EditText searchKeyWord;
+    private AutoCompleteTextView searchKeyWord;
     private Button searchFind;
 
     private ArrayList<String> startupNames;
     private ArrayList<String> categories;
     private ArrayList<String> roles;
+    private ArrayList<String> keywords;
+
+    private ArrayAdapter<String> searchNameAdapter;
+    private ArrayAdapter<String> searchCategoriesAdapter;
+    private ArrayAdapter<String> searchRolesAdapter;
+    private ArrayAdapter<String> searchKeywordsAdapter;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -97,15 +103,19 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    public void setupAutocomplete() {
+    public void setupAdapters() {
         startupNames = new ArrayList<String>();
-        ArrayAdapter<String> searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames);
-
+        searchNameAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, startupNames);
         categories = new ArrayList<String>();
-        ArrayAdapter<String> searchCategoriesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, categories);
-
+        searchCategoriesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, categories);
         roles = new ArrayList<String>();
-        ArrayAdapter<String> searchRolesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, roles);
+        searchRolesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, roles);
+        keywords = new ArrayList<String>();
+        searchKeywordsAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, keywords);
+    }
+
+    public void setupAutocomplete() {
+        setupAdapters();
 
         getColumnArray(new Function() {
             @Override
@@ -122,21 +132,37 @@ public class SearchFragment extends Fragment {
                         if (!roles.contains(role))
                             roles.add(role);
                     }
+                    ArrayList<String> keywordsInPostCaption = new ArrayList<>(Arrays.asList(post.getCaption().split("[ .,]+")));
+                    ArrayList<String> keywordsInPostDescription = new ArrayList<>(Arrays.asList(post.getDescription().split("[ .,]+")));
+
+                    for (String word : keywordsInPostCaption) {
+                        if (!keywords.contains(word));
+                            keywords.add(word);
+                    }
+                    for (String word : keywordsInPostDescription) {
+                        if (!keywords.contains(word));
+                        keywords.add(word);
+                    }
                 }
                 searchNameAdapter.notifyDataSetChanged();
                 searchCategoriesAdapter.notifyDataSetChanged();
                 searchRolesAdapter.notifyDataSetChanged();
+                searchKeywordsAdapter.notifyDataSetChanged();
             }
         });
 
+        setAdaptersToViews();
+    }
+
+    public void setAdaptersToViews() {
         searchName.setAdapter(searchNameAdapter);
         searchName.setThreshold(1);
-
         searchCategory.setAdapter(searchCategoriesAdapter);
         searchCategory.setThreshold(1);
-        
         searchRole.setAdapter(searchRolesAdapter);
         searchRole.setThreshold(1);
+        searchKeyWord.setAdapter(searchKeywordsAdapter);
+        searchKeyWord.setThreshold(1);
     }
 
     private void queryPosts(String searchName, String searchCategory, String searchKeyWord, String searchRole) {
