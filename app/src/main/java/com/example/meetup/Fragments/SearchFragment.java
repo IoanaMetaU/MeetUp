@@ -26,6 +26,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
@@ -39,12 +40,13 @@ public class SearchFragment extends Fragment {
 
     private AutoCompleteTextView searchName;
     private AutoCompleteTextView searchCategory;
+    private AutoCompleteTextView searchRole;
     private EditText searchKeyWord;
-    private EditText searchRole;
     private Button searchFind;
 
     private ArrayList<String> startupNames;
     private ArrayList<String> categories;
+    private ArrayList<String> roles;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -102,6 +104,9 @@ public class SearchFragment extends Fragment {
         categories = new ArrayList<String>();
         ArrayAdapter<String> searchCategoriesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, categories);
 
+        roles = new ArrayList<String>();
+        ArrayAdapter<String> searchRolesAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, roles);
+
         getColumnArray(new Function() {
             @Override
             public void onCalled(List<Post> postsList) {
@@ -112,9 +117,15 @@ public class SearchFragment extends Fragment {
                         startupNames.add(post.getStartupName());
                     if (!categories.contains(post.getCategory()))
                         categories.add(post.getCategory());
+                    ArrayList<String> rolesInPost = new ArrayList<>(Arrays.asList(post.getRoles().split(",[ ]*")));
+                    for (String role : rolesInPost) {
+                        if (!roles.contains(role))
+                            roles.add(role);
+                    }
                 }
                 searchNameAdapter.notifyDataSetChanged();
                 searchCategoriesAdapter.notifyDataSetChanged();
+                searchRolesAdapter.notifyDataSetChanged();
             }
         });
 
@@ -123,6 +134,9 @@ public class SearchFragment extends Fragment {
 
         searchCategory.setAdapter(searchCategoriesAdapter);
         searchCategory.setThreshold(1);
+        
+        searchRole.setAdapter(searchRolesAdapter);
+        searchRole.setThreshold(1);
     }
 
     private void queryPosts(String searchName, String searchCategory, String searchKeyWord, String searchRole) {
