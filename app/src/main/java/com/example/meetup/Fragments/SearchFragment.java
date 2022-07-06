@@ -21,6 +21,7 @@ import android.widget.EditText;
 import com.example.meetup.Adapters.PostsAdapter;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
+import com.example.meetup.StringProcessing;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -99,6 +100,9 @@ public class SearchFragment extends Fragment {
                 searchCategory.setText("");
                 searchKeyWord.setText("");
                 searchRole.setText("");
+
+                allPosts.clear();
+                adapter.clear();
             }
         });
     }
@@ -132,17 +136,20 @@ public class SearchFragment extends Fragment {
                         if (!roles.contains(role))
                             roles.add(role);
                     }
-                    ArrayList<String> keywordsInPostCaption = new ArrayList<>(Arrays.asList(post.getCaption().split("[ .,]+")));
-                    ArrayList<String> keywordsInPostDescription = new ArrayList<>(Arrays.asList(post.getDescription().split("[ .,]+")));
 
-                    for (String word : keywordsInPostCaption) {
-                        if (!keywords.contains(word));
-                            keywords.add(word);
-                    }
-                    for (String word : keywordsInPostDescription) {
-                        if (!keywords.contains(word));
-                        keywords.add(word);
-                    }
+                    StringProcessing.getNouns(post.getDescription());
+//                    TODO update this code to use tokenizer and nouns as keywords
+//                    ArrayList<String> keywordsInPostCaption = new ArrayList<>(Arrays.asList(post.getCaption().split("[ .,]+")));
+//                    ArrayList<String> keywordsInPostDescription = new ArrayList<>(Arrays.asList(post.getDescription().split("[ .,]+")));
+//
+//                    for (String word : keywordsInPostCaption) {
+//                        if (!keywords.contains(word));
+//                            keywords.add(word);
+//                    }
+//                    for (String word : keywordsInPostDescription) {
+//                        if (!keywords.contains(word));
+//                        keywords.add(word);
+//                    }
                 }
                 searchNameAdapter.notifyDataSetChanged();
                 searchCategoriesAdapter.notifyDataSetChanged();
