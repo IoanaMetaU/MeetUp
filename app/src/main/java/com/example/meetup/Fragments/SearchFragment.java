@@ -5,30 +5,45 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 
+import com.example.meetup.AccessTokenLoader;
 import com.example.meetup.Adapters.PostsAdapter;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
-import com.example.meetup.StringProcessing;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.GenericJson;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.language.v1.CloudNaturalLanguage;
+import com.google.api.services.language.v1.CloudNaturalLanguageRequest;
+import com.google.api.services.language.v1.CloudNaturalLanguageScopes;
+import com.google.api.services.language.v1.model.AnnotateTextRequest;
+import com.google.api.services.language.v1.model.Document;
+import com.google.api.services.language.v1.model.Features;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class SearchFragment extends Fragment {
 
@@ -55,12 +70,34 @@ public class SearchFragment extends Fragment {
     private ArrayAdapter<String> searchRolesAdapter;
     private ArrayAdapter<String> searchKeywordsAdapter;
 
+    private static final int LOADER_ACCESS_TOKEN = 1; // Token used to initiate the request loader
+    private GoogleCredential mCredential = null; //GoogleCredential object so that the requests for NLP Api could be made
+
+    // A  Thread on which the Api request will be made and results will be delivered. As network calls cannot be made on the amin thread, so we are creating a separate thread for the network calls
+    private Thread mThread;
+
+    // Google Request for the NLP Api. This actually is acting like a Http client queue that will process each request and response from the Google Cloud server
+    private final BlockingQueue<CloudNaturalLanguageRequest<? extends GenericJson>> mRequests
+            = new ArrayBlockingQueue<>(100);
+
+    // Api for CloudNaturalLanguage from the Google Client library, this is the instance of our request that we will make to analyze the text.
+    private CloudNaturalLanguage mApi = new CloudNaturalLanguage.Builder(
+            new NetHttpTransport(),
+            JacksonFactory.getDefaultInstance(),
+            new HttpRequestInitializer() {
+                @Override
+                public void initialize(HttpRequest request) throws IOException {
+                    mCredential.initialize(request);
+                }
+            }).build();
+
+
     public SearchFragment() {
         // Required empty public constructor
     }
 
     interface Function {
-        public void onCalled(List<Post> posts);
+        public void onCalled(List<Post> posts) throws IOException;
     }
 
     @Override
@@ -77,6 +114,8 @@ public class SearchFragment extends Fragment {
         searchKeyWord = view.findViewById(R.id.searchKeyWord);
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
+
+        prepareApi();
 
         setupAutocomplete();
 
@@ -101,8 +140,8 @@ public class SearchFragment extends Fragment {
                 searchKeyWord.setText("");
                 searchRole.setText("");
 
-                allPosts.clear();
-                adapter.clear();
+//                allPosts.clear();
+//                adapter.clear();
             }
         });
     }
@@ -123,9 +162,11 @@ public class SearchFragment extends Fragment {
 
         getColumnArray(new Function() {
             @Override
-            public void onCalled(List<Post> postsList) {
+            public void onCalled(List<Post> postsList) throws IOException {
                 startupNames.clear();
                 categories.clear();
+                keywords.clear();
+                roles.clear();
                 for (Post post : postsList) {
                     if (!startupNames.contains(post.getStartupName()))
                         startupNames.add(post.getStartupName());
@@ -136,8 +177,9 @@ public class SearchFragment extends Fragment {
                         if (!roles.contains(role))
                             roles.add(role);
                     }
-
-                    StringProcessing.getNouns(post.getDescription());
+                    String text = post.getDescription();
+                    analyzeTextUsingCloudNLPApi(text);
+                   // StringProcessing.getNouns(post.getDescription(), getContext());
 //                    TODO update this code to use tokenizer and nouns as keywords
 //                    ArrayList<String> keywordsInPostCaption = new ArrayList<>(Arrays.asList(post.getCaption().split("[ .,]+")));
 //                    ArrayList<String> keywordsInPostDescription = new ArrayList<>(Arrays.asList(post.getDescription().split("[ .,]+")));
@@ -225,9 +267,145 @@ public class SearchFragment extends Fragment {
                     Log.e(TAG, "issue getting posts");
                 }
                 if (posts.size() > 0) {
-                    callback.onCalled(posts);
+                    try {
+                        callback.onCalled(posts);
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         });
+    }
+
+//    /**
+//     * Method called on the click of the Button
+//     * @param view -> the view which is clicked
+//     */
+//    public void startAnalysis(View view) {
+//        String textToAnalyze = editTextView.getText().toString();
+//        if (TextUtils.isEmpty(textToAnalyze)) {
+//            editTextView.setError(getString(R.string.empty_text_error_msg));
+//        } else {
+//            editTextView.setError(null);
+//            analyzeTextUsingCloudNLPApi(textToAnalyze);
+//        }
+//    }
+
+    // send text to Cloud Api for analysis
+    public void analyzeTextUsingCloudNLPApi(String text) {
+        try {
+            mRequests.add(mApi
+                    .documents()
+                    .annotateText(new AnnotateTextRequest()
+                            .setDocument(new Document()
+                                    .setContent(text)
+                                    .setType("PLAIN_TEXT"))
+                            .setFeatures(new Features()
+                                    .setExtractSyntax(true)
+                                    .setExtractEntities(true)
+                            )));
+        } catch (IOException e) {
+            Log.e("TAG", "Failed to create analyze request.", e);
+        }
+    }
+
+
+    /**
+     * Preparing the Cloud Api before making the actual request.
+     * This method will actually initiate the AccessTokenLoader async task on completion
+     * of which we will recieve the token that should be set in our request for Cloud NLP Api.
+     */
+    private void prepareApi() {
+        // Initiate token refresh
+        getLoaderManager().initLoader(LOADER_ACCESS_TOKEN, null,
+                new LoaderManager.LoaderCallbacks<String>() {
+                    @Override
+                    public Loader<String> onCreateLoader(int id, Bundle args) {
+                        return new AccessTokenLoader(getContext());
+                    }
+
+                    @Override
+                    public void onLoadFinished(Loader<String> loader, String token) {
+                        setAccessToken(token);
+                    }
+
+                    @Override
+                    public void onLoaderReset(Loader<String> loader) {
+                    }
+                });
+    }
+
+
+    /**
+     * This method will set the token from the Credentials.json file to the Google credential object.
+     * @param token -> token recieved from the Credentials.json file.
+     */
+    public void setAccessToken(String token) {
+        mCredential = new GoogleCredential()
+                .setAccessToken(token)
+                .createScoped(CloudNaturalLanguageScopes.all());
+        startWorkerThread();
+    }
+
+
+    /**
+     * This method will actually initiate a Thread and on this thread we will execute our Api request
+     * and responses.
+     *
+     * Responses recieved will be delivered from here.
+     */
+    private void startWorkerThread() {
+        if (mThread != null) {
+            return;
+        }
+        mThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (mThread == null) {
+                        break;
+                    }
+                    try {
+                        // API calls are executed here in this worker thread
+                        deliverResponse(mRequests.take().execute());
+                    } catch (InterruptedException e) {
+                        Log.e("TAG", "Interrupted.", e);
+                        break;
+                    } catch (IOException e) {
+                        Log.e("TAG", "Failed to execute a request.", e);
+                    }
+                }
+            }
+        });
+        mThread.start();
+    }
+
+
+    /**
+     * this method will handle the response recieved from the Cloud NLP request.
+     * The response is a JSON object only.
+     * This has been casted to GenericJson from Google Cloud so that the developers can easily parse through the same and can understand the response.
+     *
+     *
+     * @param response --> the JSON object recieved as a response for the cloud NLP Api request
+     */
+    private void deliverResponse(final GenericJson response) {
+        Log.d("TAG", "Generic Response --> " + response);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "Response Recieved from Cloud NLP API");
+                try {
+                    Log.i(TAG, response.toPrettyString());
+//                    resultTextView.setText(response.toPrettyString());
+//                    nestedScrollView.setVisibility(View.VISIBLE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
     }
 }
