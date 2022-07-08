@@ -31,9 +31,13 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.language.v1.CloudNaturalLanguage;
 import com.google.api.services.language.v1.CloudNaturalLanguageRequest;
 import com.google.api.services.language.v1.CloudNaturalLanguageScopes;
+import com.google.api.services.language.v1.model.AnalyzeEntitiesResponse;
 import com.google.api.services.language.v1.model.AnnotateTextRequest;
 import com.google.api.services.language.v1.model.Document;
 import com.google.api.services.language.v1.model.Features;
+import com.google.api.services.language.v1.model.Token;
+import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.gson.JsonObject;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -71,23 +75,23 @@ public class SearchFragment extends Fragment {
     private ArrayAdapter<String> searchKeywordsAdapter;
 
     private static final int LOADER_ACCESS_TOKEN = 1; // Token used to initiate the request loader
-    private GoogleCredential mCredential = null; //GoogleCredential object so that the requests for NLP Api could be made
+    private GoogleCredential credential = null; //GoogleCredential object so that the requests for NLP Api could be made
 
     // A  Thread on which the Api request will be made and results will be delivered. As network calls cannot be made on the amin thread, so we are creating a separate thread for the network calls
-    private Thread mThread;
+    private Thread thread;
 
     // Google Request for the NLP Api. This actually is acting like a Http client queue that will process each request and response from the Google Cloud server
-    private final BlockingQueue<CloudNaturalLanguageRequest<? extends GenericJson>> mRequests
+    private final BlockingQueue<CloudNaturalLanguageRequest<? extends GenericJson>> requests
             = new ArrayBlockingQueue<>(100);
 
     // Api for CloudNaturalLanguage from the Google Client library, this is the instance of our request that we will make to analyze the text.
-    private CloudNaturalLanguage mApi = new CloudNaturalLanguage.Builder(
+    private CloudNaturalLanguage api = new CloudNaturalLanguage.Builder(
             new NetHttpTransport(),
             JacksonFactory.getDefaultInstance(),
             new HttpRequestInitializer() {
                 @Override
                 public void initialize(HttpRequest request) throws IOException {
-                    mCredential.initialize(request);
+                    credential.initialize(request);
                 }
             }).build();
 
@@ -115,8 +119,6 @@ public class SearchFragment extends Fragment {
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
 
-        prepareApi();
-
         setupAutocomplete();
 
         posts = view.findViewById(R.id.posts);
@@ -140,8 +142,8 @@ public class SearchFragment extends Fragment {
                 searchKeyWord.setText("");
                 searchRole.setText("");
 
-//                allPosts.clear();
-//                adapter.clear();
+                allPosts.clear();
+                adapter.clear();
             }
         });
     }
@@ -163,10 +165,6 @@ public class SearchFragment extends Fragment {
         getColumnArray(new Function() {
             @Override
             public void onCalled(List<Post> postsList) throws IOException {
-                startupNames.clear();
-                categories.clear();
-                keywords.clear();
-                roles.clear();
                 for (Post post : postsList) {
                     if (!startupNames.contains(post.getStartupName()))
                         startupNames.add(post.getStartupName());
@@ -177,26 +175,16 @@ public class SearchFragment extends Fragment {
                         if (!roles.contains(role))
                             roles.add(role);
                     }
-                    String text = post.getDescription();
-                    analyzeTextUsingCloudNLPApi(text);
-                   // StringProcessing.getNouns(post.getDescription(), getContext());
-//                    TODO update this code to use tokenizer and nouns as keywords
-//                    ArrayList<String> keywordsInPostCaption = new ArrayList<>(Arrays.asList(post.getCaption().split("[ .,]+")));
-//                    ArrayList<String> keywordsInPostDescription = new ArrayList<>(Arrays.asList(post.getDescription().split("[ .,]+")));
-//
-//                    for (String word : keywordsInPostCaption) {
-//                        if (!keywords.contains(word));
-//                            keywords.add(word);
-//                    }
-//                    for (String word : keywordsInPostDescription) {
-//                        if (!keywords.contains(word));
-//                        keywords.add(word);
-//                    }
+                    String textDescription = post.getDescription();
+                    analyzeTextUsingCloudNLPApi(textDescription);
+
+                    String textCaption = post.getCaption();
+                    analyzeTextUsingCloudNLPApi(textCaption);
+
                 }
                 searchNameAdapter.notifyDataSetChanged();
                 searchCategoriesAdapter.notifyDataSetChanged();
                 searchRolesAdapter.notifyDataSetChanged();
-                searchKeywordsAdapter.notifyDataSetChanged();
             }
         });
 
@@ -277,24 +265,10 @@ public class SearchFragment extends Fragment {
         });
     }
 
-//    /**
-//     * Method called on the click of the Button
-//     * @param view -> the view which is clicked
-//     */
-//    public void startAnalysis(View view) {
-//        String textToAnalyze = editTextView.getText().toString();
-//        if (TextUtils.isEmpty(textToAnalyze)) {
-//            editTextView.setError(getString(R.string.empty_text_error_msg));
-//        } else {
-//            editTextView.setError(null);
-//            analyzeTextUsingCloudNLPApi(textToAnalyze);
-//        }
-//    }
-
     // send text to Cloud Api for analysis
     public void analyzeTextUsingCloudNLPApi(String text) {
         try {
-            mRequests.add(mApi
+            requests.add(api
                     .documents()
                     .annotateText(new AnnotateTextRequest()
                             .setDocument(new Document()
@@ -304,6 +278,7 @@ public class SearchFragment extends Fragment {
                                     .setExtractSyntax(true)
                                     .setExtractEntities(true)
                             )));
+            prepareApi();
         } catch (IOException e) {
             Log.e("TAG", "Failed to create analyze request.", e);
         }
@@ -341,7 +316,7 @@ public class SearchFragment extends Fragment {
      * @param token -> token recieved from the Credentials.json file.
      */
     public void setAccessToken(String token) {
-        mCredential = new GoogleCredential()
+        credential = new GoogleCredential()
                 .setAccessToken(token)
                 .createScoped(CloudNaturalLanguageScopes.all());
         startWorkerThread();
@@ -355,19 +330,20 @@ public class SearchFragment extends Fragment {
      * Responses recieved will be delivered from here.
      */
     private void startWorkerThread() {
-        if (mThread != null) {
+        if (thread != null) {
             return;
         }
-        mThread = new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                    if (mThread == null) {
+                    if (thread == null) {
                         break;
                     }
                     try {
                         // API calls are executed here in this worker thread
-                        deliverResponse(mRequests.take().execute());
+                        Log.i(TAG, requests.toString());
+                        deliverResponse(requests.take().execute());
                     } catch (InterruptedException e) {
                         Log.e("TAG", "Interrupted.", e);
                         break;
@@ -377,7 +353,7 @@ public class SearchFragment extends Fragment {
                 }
             }
         });
-        mThread.start();
+        thread.start();
     }
 
 
@@ -395,17 +371,21 @@ public class SearchFragment extends Fragment {
             @Override
             public void run() {
                 Log.i(TAG, "Response Recieved from Cloud NLP API");
-                try {
-                    Log.i(TAG, response.toPrettyString());
-//                    resultTextView.setText(response.toPrettyString());
-//                    nestedScrollView.setVisibility(View.VISIBLE);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                for (Token token:((ArrayList<Token>) response.get("tokens"))) {
+                    String tag = token.getPartOfSpeech().getTag();
+                    Log.i(TAG, tag);
+                    if (tag.equals("NOUN")) {
+                        Log.i(TAG, token.getLemma());
+                        Log.i(TAG, keywords.toString());
+                        if (!keywords.contains(token.getLemma())) {
+                            keywords.add(token.getLemma());
+                            Log.i(TAG, token.getLemma());
+                        }
+                    }
                 }
-
+                searchKeywordsAdapter.notifyDataSetChanged();
             }
-        });
-
+       });
 
     }
 }
