@@ -13,38 +13,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchFind" />
 
-    <EditText
-        android:id="@+id/searchName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="name"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/searchCategory"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="category"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchName" />
-
-    <EditText
-        android:id="@+id/searchKeyWord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="key word"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchCategory" />
-
     <Button
         android:id="@+id/searchFind"
         android:layout_width="wrap_content"
@@ -56,15 +24,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchRole" />
 
-    <EditText
-        android:id="@+id/searchRole"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/searchName"
+        android:layout_width="208dp"
+        android:layout_height="42dp"
+        android:hint="name"
         android:ems="10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <AutoCompleteTextView
+        android:id="@+id/searchCategory"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:hint="category"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchName" />
+
+    <AutoCompleteTextView
+        android:id="@+id/searchRole"
+        android:layout_width="210dp"
+        android:layout_height="48dp"
         android:hint="role"
-        android:inputType="textPersonName"
-        android:minHeight="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchKeyWord" />
+
+    <AutoCompleteTextView
+        android:id="@+id/searchKeyWord"
+        android:layout_width="211dp"
+        android:layout_height="48dp"
+        android:hint="keyword"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchCategory" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

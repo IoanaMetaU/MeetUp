@@ -74,7 +74,7 @@ public class ComposeFragment extends Fragment {
         // TODO location = itemView.findViewById(R.id.location);
         captionCompose = view.findViewById(R.id.captionCompose);
         descriptionCompose = view.findViewById(R.id.descriptionCompose);
-        // TODO list of roles = itemView.findViewById(R.id.roles);
+        rolesCompose = view.findViewById(R.id.rolesCompose);
         uploadImageCompose = view.findViewById(R.id.uploadImageCompose);
         submitCompose = view.findViewById(R.id.submit);
         constraintLayoutCompose = view.findViewById(R.id.constraintLayoutCompose);
@@ -96,6 +96,7 @@ public class ComposeFragment extends Fragment {
                 String caption = captionCompose.getText().toString();
                 String category = categoryCompose.getText().toString();
                 String startupName = startupNameCompose.getText().toString();
+                String roles = rolesCompose.getText().toString();
                 if (description.isEmpty()) {
                     Toast.makeText(getContext(), "description can't be empty", Toast.LENGTH_SHORT).show();
                     return;
@@ -105,7 +106,7 @@ public class ComposeFragment extends Fragment {
                     return;
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                savePost(startupName, description, caption, category, currentUser, photoFile);
+                savePost(startupName, description, caption, category, roles, currentUser, photoFile);
             }
         });
     }
@@ -157,13 +158,14 @@ public class ComposeFragment extends Fragment {
         }
     }
 
-    private void savePost(String startupName, String description, String caption, String category, ParseUser currentUser, File photoFile) {
+    private void savePost(String startupName, String description, String caption, String category, String roles, ParseUser currentUser, File photoFile) {
         Post post = new Post();
         post.setStartupName(startupName);
         post.setCaption(caption);
         post.setDescription(description);
         post.setCategory(category);
         post.setUser(currentUser);
+        post.setRoles(roles);
         ParseFile image = new ParseFile(photoFile);
         image.saveInBackground(new SaveCallback() {
             @Override
