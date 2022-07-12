@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -100,8 +101,8 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-    interface Function {
-        public void onCalled(List<Post> posts) throws IOException;
+    interface QueryResponseCallback {
+        public void onPostsReturned(List<Post> posts) throws IOException;
     }
 
     @Override
@@ -162,9 +163,9 @@ public class SearchFragment extends Fragment {
     public void setupAutocomplete() {
         setupAdapters();
 
-        getColumnArray(new Function() {
+        getColumnArray(new QueryResponseCallback() {
             @Override
-            public void onCalled(List<Post> postsList) throws IOException {
+            public void onPostsReturned(List<Post> postsList) throws IOException {
                 for (Post post : postsList) {
                     if (!startupNames.contains(post.getStartupName()))
                         startupNames.add(post.getStartupName());
@@ -245,7 +246,7 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void getColumnArray(Function callback) {
+    private void getColumnArray(QueryResponseCallback callback) {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.findInBackground(new FindCallback<Post>() {
@@ -256,7 +257,7 @@ public class SearchFragment extends Fragment {
                 }
                 if (posts.size() > 0) {
                     try {
-                        callback.onCalled(posts);
+                        callback.onPostsReturned(posts);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -367,7 +368,7 @@ public class SearchFragment extends Fragment {
      */
     private void deliverResponse(final GenericJson response) {
         Log.d("TAG", "Generic Response --> " + response);
-        getActivity().runOnUiThread(new Runnable() {
+        requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Log.i(TAG, "Response Recieved from Cloud NLP API");
