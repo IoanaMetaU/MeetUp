@@ -3,7 +3,6 @@ package com.example.meetup.Fragments;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +32,7 @@ import com.example.meetup.Models.MapMarker;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -130,18 +130,11 @@ public class ComposeFragment extends Fragment {
 
         FusedLocationProviderClient locationClient = getFusedLocationProviderClient(requireContext());
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             // return;
         }
-        locationClient.getCurrentLocation()
+        locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
@@ -152,10 +145,10 @@ public class ComposeFragment extends Fragment {
                                 if (e != null) {
                                     Log.e(TAG, "Error while saving new map marker!", e);
                                     Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
-                                    locationCompose = mapMarker;
-                                    savePost(startupName, description, caption, category, roles, currentUser, photoFile, locationCompose);
                                 }
                                 Log.i(TAG, "MapMarker save was successful!");
+                                locationCompose = mapMarker;
+                                savePost(startupName, description, caption, category, roles, currentUser, photoFile, locationCompose);
                             });
                         }
                     }

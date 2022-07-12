@@ -1,44 +1,23 @@
 package com.example.meetup.Fragments;
 
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
-
-import android.Manifest;
-import android.app.AlertDialog;
-import android.app.DownloadManager;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import android.os.Looper;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
-import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.meetup.Models.MapMarker;
 import com.example.meetup.R;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -46,17 +25,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.parse.Parse;
-import com.parse.ParseException;
-import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
@@ -64,11 +35,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public static final String TAG = "MapsFragment";
     private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private LocationRequest mLocationRequest;
-    Location mCurrentLocation;
-    private long UPDATE_INTERVAL = 60000;  /* 60 secs */
-    private long FASTEST_INTERVAL = 5000; /* 5 secs */
-    private FusedLocationProviderClient fusedLocationClient;
+    Location currentLocation;
     private final static String KEY_LOCATION = "location";
     private List<MapMarker> allMarkers;
 
@@ -91,9 +58,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         allMarkers = new ArrayList<>();
 
         if (savedInstanceState != null && savedInstanceState.keySet().contains(KEY_LOCATION)) {
-            // Since KEY_LOCATION was found in the Bundle, we can be sure that mCurrentLocation
+            // Since KEY_LOCATION was found in the Bundle, we can be sure that currentLocation
             // is not null.
-            mCurrentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
         }
 
         queryMapMarkers();
@@ -112,12 +79,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             // Add a new latitude in the midwest and move to it
             LatLng UnitedStates = new LatLng(38.20888835170237 , -101.71670772135258);
             Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
-//            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-//                @Override
-//                public void onMapLongClick(LatLng latLng) {
-//                    showAlertDialogForPoint(latLng);
-//                }
-//            });
         } else {
             Toast.makeText(getActivity(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -173,62 +134,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
     }
-
-    public void getMyLocation(String title) {
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "No location");
-        }
-        map.setMyLocationEnabled(true);
-        map.getUiSettings().setMyLocationButtonEnabled(true);
-    }
-//    public void onLocationChanged(Location location) {
-//        // GPS may be turned off
-//        if (location == null) {
-//            return;
-//        }
-//
-//        mCurrentLocation = location;
-//        String msg = "Updated Location: " +
-//                Double.toString(location.getLatitude()) + "," +
-//                Double.toString(location.getLongitude());
-//        Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show();
-//        displayLocation();
-//    }
-//
-//    public LatLng displayLocation() {
-//        if (mCurrentLocation != null) {
-//            Toast.makeText(requireActivity(), "GPS location was found!", Toast.LENGTH_SHORT).show();
-//            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-//            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-//            map.animateCamera(cameraUpdate);
-//            return latLng;
-//        } else {
-//            Toast.makeText(requireActivity(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
-//            return null;
-//        }
-//    }
-//
-//    protected void startLocationUpdates() {
-//        mLocationRequest = new LocationRequest();
-//        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-//        mLocationRequest.setInterval(UPDATE_INTERVAL);
-//        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-//
-//        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-//        builder.addLocationRequest(mLocationRequest);
-//        LocationSettingsRequest locationSettingsRequest = builder.build();
-//
-//        SettingsClient settingsClient = LocationServices.getSettingsClient(requireContext());
-//        settingsClient.checkLocationSettings(locationSettingsRequest);
-//        //noinspection MissingPermission
-//        getFusedLocationProviderClient(requireContext()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
-//                    @Override
-//                    public void onLocationResult(LocationResult locationResult) {
-//                        // onLocationChanged(locationResult.getLastLocation());
-//                    }
-//                },
-//                Looper.myLooper());
-//    }
 
     private void queryMapMarkers() {
         ParseQuery<MapMarker> query = ParseQuery.getQuery(MapMarker.class);
