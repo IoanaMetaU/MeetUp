@@ -147,8 +147,8 @@ public class ComposeFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
                                 }
                                 Log.i(TAG, "MapMarker save was successful!");
-                                locationCompose = mapMarker;
-                                savePost(startupName, description, caption, category, roles, currentUser, photoFile, locationCompose);
+                                locationCompose = mapMarker ;
+                                savePost(startupName, description, caption, category, roles, currentUser, photoFile, locationCompose, locationCompose.getLocation());
                             });
                         }
                     }
@@ -213,7 +213,7 @@ public class ComposeFragment extends Fragment {
 
     }
 
-    private void savePost(String startupName, String description, String caption, String category, String roles, ParseUser currentUser, File photoFile, MapMarker mapMarker) {
+    private void savePost(String startupName, String description, String caption, String category, String roles, ParseUser currentUser, File photoFile, MapMarker mapMarker, ParseGeoPoint geoPoint) {
         Post post = new Post();
         post.setStartupName(startupName);
         post.setCaption(caption);
@@ -222,6 +222,7 @@ public class ComposeFragment extends Fragment {
         post.setUser(currentUser);
         post.setRoles(roles);
         post.setMapMarker(mapMarker);
+        post.setGeoPoint(geoPoint);
         ParseFile image = new ParseFile(photoFile);
         image.saveInBackground(new SaveCallback() {
             @Override

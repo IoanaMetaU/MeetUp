@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -21,6 +22,7 @@ public class Post extends ParseObject {
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_ROLES = "roles";
     public static final String KEY_MAP_MARKER = "mapMarker";
+    public static final String KEY_GEOPOINT = "geoPoint";
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
@@ -79,6 +81,10 @@ public class Post extends ParseObject {
     public String getMapMarker() {return getString(KEY_MAP_MARKER); }
 
     public void setMapMarker(MapMarker mapMarker) {put(KEY_MAP_MARKER, mapMarker); }
+
+    public void setGeoPoint(ParseGeoPoint geoPoint) {put(KEY_GEOPOINT, geoPoint); }
+
+    public ParseGeoPoint getGeoPoint() {return getParseGeoPoint(KEY_GEOPOINT); }
 
 
     public static String calculateTimeAgo(Date createdAt) {
