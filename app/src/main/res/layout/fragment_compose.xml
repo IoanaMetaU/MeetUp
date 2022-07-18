@@ -11,75 +11,105 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/startupNameCompose"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextInputLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="49dp"
-            android:layout_marginEnd="101dp"
-            android:ems="10"
+            android:layout_marginTop="25dp"
             android:hint="startup name"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/categoryCompose"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/startupNameCompose"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextInputLayoutCategory"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginEnd="101dp"
-            android:ems="10"
+            android:layout_marginTop="25dp"
             android:hint="category"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/startupNameCompose" />
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayout">
 
-        <EditText
-            android:id="@+id/captionCompose"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/categoryCompose"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColorHint="#616161" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextInputLayoutCaption"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginEnd="101dp"
-            android:ems="10"
+            android:layout_marginTop="25dp"
             android:hint="caption"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/categoryCompose" />
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCategory"
+            app:counterEnabled="true"
+            app:counterMaxLength="50">
 
-        <EditText
-            android:id="@+id/descriptionCompose"
-            android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/captionCompose"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextInputLayoutDescription"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="101dp"
-            android:ems="10"
+            android:layout_marginTop="25dp"
             android:hint="description"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/captionCompose" />
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCaption"
+            app:counterEnabled="true"
+            app:counterMaxLength="250">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/descriptionCompose"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextInputLayoutRoles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:hint="roles"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutDescription">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/rolesCompose"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/submit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="154dp"
-            android:layout_marginEnd="166dp"
+            android:layout_marginStart="160dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="160dp"
             android:text="submit"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/logoCompose" />
 
@@ -87,13 +117,13 @@
             android:id="@+id/uploadImageCompose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="135dp"
-            android:layout_marginEnd="129dp"
-            android:text="upload image"
+            android:layout_marginStart="136dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="136dp"
+            android:text="upload logo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rolesCompose" />
+            app:layout_constraintTop_toBottomOf="@+id/TextInputLayoutRoles" />
 
         <ImageView
             android:id="@+id/logoCompose"
@@ -101,22 +131,10 @@
             android:layout_height="50dp"
             android:layout_marginTop="4dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/uploadImageCompose"
             tools:src="@tools:sample/avatars" />
-
-        <EditText
-            android:id="@+id/rolesCompose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:ems="10"
-            android:hint="roles"
-            android:inputType="textPersonName"
-            android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/descriptionCompose" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
