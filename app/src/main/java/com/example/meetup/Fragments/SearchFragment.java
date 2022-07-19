@@ -434,7 +434,7 @@ public class SearchFragment extends Fragment {
      */
     private void deliverResponse(final GenericJson response) {
         Log.d("TAG", "Generic Response --> " + response);
-        requireActivity().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Log.i(TAG, "Response Recieved from Cloud NLP API");

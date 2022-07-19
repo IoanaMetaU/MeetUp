@@ -15,8 +15,12 @@
             android:id="@+id/TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="25dp"
+            android:layout_marginEnd="32dp"
             android:hint="startup name"
+            app:counterEnabled="true"
+            app:counterMaxLength="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -32,8 +36,12 @@
             android:id="@+id/TextInputLayoutCategory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="25dp"
+            android:layout_marginEnd="32dp"
             android:hint="category"
+            app:counterEnabled="true"
+            app:counterMaxLength="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/TextInputLayout">
@@ -50,13 +58,15 @@
             android:id="@+id/TextInputLayoutCaption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="25dp"
+            android:layout_marginEnd="32dp"
             android:hint="caption"
+            app:counterEnabled="true"
+            app:counterMaxLength="50"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCategory"
-            app:counterEnabled="true"
-            app:counterMaxLength="50">
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCategory">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/captionCompose"
@@ -69,13 +79,15 @@
             android:id="@+id/TextInputLayoutDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="25dp"
+            android:layout_marginEnd="32dp"
             android:hint="description"
+            app:counterEnabled="true"
+            app:counterMaxLength="250"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCaption"
-            app:counterEnabled="true"
-            app:counterMaxLength="250">
+            app:layout_constraintTop_toBottomOf="@id/TextInputLayoutCaption">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/descriptionCompose"
@@ -88,8 +100,12 @@
             android:id="@+id/TextInputLayoutRoles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="25dp"
+            android:layout_marginEnd="32dp"
             android:hint="roles"
+            app:counterEnabled="true"
+            app:counterMaxLength="50"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/TextInputLayoutDescription">

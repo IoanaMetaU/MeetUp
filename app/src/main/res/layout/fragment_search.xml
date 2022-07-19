@@ -26,12 +26,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchDistance" />
 
-    <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <AutoCompleteTextView
         android:id="@+id/searchName"
         android:layout_width="208dp"
-        android:layout_height="42dp"
-        android:hint="name"
+        android:layout_height="48dp"
+        android:layout_marginTop="30dp"
         android:ems="10"
+        android:hint="name"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,6 +42,7 @@
         android:layout_width="210dp"
         android:layout_height="50dp"
         android:hint="category"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchName" />
 
@@ -48,6 +51,7 @@
         android:layout_width="210dp"
         android:layout_height="48dp"
         android:hint="role"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchKeyWord" />
 
@@ -56,6 +60,7 @@
         android:layout_width="211dp"
         android:layout_height="48dp"
         android:hint="keyword"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchCategory" />
 
@@ -74,9 +79,10 @@
 
     <TextView
         android:id="@+id/distanceText"
-        android:layout_width="208dp"
-        android:layout_height="31dp"
-        android:text="distance less than (km)"
+        android:layout_width="213dp"
+        android:layout_height="26dp"
+        android:hint="distance less than (km)"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchRole" />
 
