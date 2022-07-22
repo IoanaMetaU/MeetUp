@@ -2,17 +2,13 @@ package com.example.meetup.Models;
 
 import android.util.Log;
 
-import com.parse.FindCallback;
 import com.parse.ParseClassName;
-import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @ParseClassName("Post")
 public class Post extends ParseObject {
@@ -25,6 +21,8 @@ public class Post extends ParseObject {
     public static final String KEY_STARTUP_NAME = "startup_name";
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_ROLES = "roles";
+    public static final String KEY_MAP_MARKER = "mapMarker";
+    public static final String KEY_GEOPOINT = "geoPoint";
 
     public String getDescription() {
         return getString(KEY_DESCRIPTION);
@@ -79,6 +77,14 @@ public class Post extends ParseObject {
     }
 
     public void setRoles(String roles) { put(KEY_ROLES, roles);}
+
+    public String getMapMarker() {return getString(KEY_MAP_MARKER); }
+
+    public void setMapMarker(MapMarker mapMarker) {put(KEY_MAP_MARKER, mapMarker); }
+
+    public void setGeoPoint(ParseGeoPoint geoPoint) {put(KEY_GEOPOINT, geoPoint); }
+
+    public ParseGeoPoint getGeoPoint() {return getParseGeoPoint(KEY_GEOPOINT); }
 
 
     public static String calculateTimeAgo(Date createdAt) {

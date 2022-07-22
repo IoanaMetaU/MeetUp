@@ -18,18 +18,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="129dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="130dp"
         android:text="find startups"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/searchRole" />
+        app:layout_constraintTop_toBottomOf="@+id/searchDistance" />
 
-    <AutoCompleteTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <AutoCompleteTextView
         android:id="@+id/searchName"
         android:layout_width="208dp"
-        android:layout_height="42dp"
-        android:hint="name"
+        android:layout_height="48dp"
+        android:layout_marginTop="30dp"
         android:ems="10"
+        android:hint="name"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -38,6 +42,7 @@
         android:layout_width="210dp"
         android:layout_height="50dp"
         android:hint="category"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchName" />
 
@@ -46,6 +51,7 @@
         android:layout_width="210dp"
         android:layout_height="48dp"
         android:hint="role"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchKeyWord" />
 
@@ -54,7 +60,30 @@
         android:layout_width="211dp"
         android:layout_height="48dp"
         android:hint="keyword"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchCategory" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/searchDistance"
+        android:layout_width="399dp"
+        android:layout_height="57dp"
+        android:contentDescription="distance"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="20000"
+        app:labelBehavior="withinBounds"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/distanceText" />
+
+    <TextView
+        android:id="@+id/distanceText"
+        android:layout_width="213dp"
+        android:layout_height="26dp"
+        android:hint="distance less than (km)"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchRole" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

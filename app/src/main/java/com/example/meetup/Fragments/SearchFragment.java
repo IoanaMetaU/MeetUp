@@ -1,9 +1,15 @@
 package com.example.meetup.Fragments;
 
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
@@ -17,11 +23,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meetup.AccessTokenLoader;
 import com.example.meetup.Adapters.PostsAdapter;
+import com.example.meetup.Models.MapMarker;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.slider.Slider;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -40,12 +55,14 @@ import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.gson.JsonObject;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -63,6 +80,10 @@ public class SearchFragment extends Fragment {
     private AutoCompleteTextView searchRole;
     private AutoCompleteTextView searchKeyWord;
     private Button searchFind;
+    private TextView distanceText;
+    private Slider searchDistance;
+    private float maxDistance;
+    private MapMarker currentLocation;
 
     private ArrayList<String> startupNames;
     private ArrayList<String> categories;
@@ -100,8 +121,8 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-    interface Function {
-        public void onCalled(List<Post> posts) throws IOException;
+    interface QueryResponseCallback {
+        public void onPostsReturned(List<Post> posts) throws IOException;
     }
 
     @Override
@@ -118,6 +139,14 @@ public class SearchFragment extends Fragment {
         searchKeyWord = view.findViewById(R.id.searchKeyWord);
         searchRole = view.findViewById(R.id.searchRole);
         searchFind = view.findViewById(R.id.searchFind);
+        searchDistance = view.findViewById(R.id.searchDistance);
+        distanceText = view.findViewById(R.id.distanceText);
+        searchDistance.addOnChangeListener(new Slider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                maxDistance = value;
+            }
+        });
 
         setupAutocomplete();
 
@@ -162,9 +191,9 @@ public class SearchFragment extends Fragment {
     public void setupAutocomplete() {
         setupAdapters();
 
-        getColumnArray(new Function() {
+        getColumnArray(new QueryResponseCallback() {
             @Override
-            public void onCalled(List<Post> postsList) throws IOException {
+            public void onPostsReturned(List<Post> postsList) throws IOException {
                 for (Post post : postsList) {
                     if (!startupNames.contains(post.getStartupName()))
                         startupNames.add(post.getStartupName());
@@ -228,24 +257,62 @@ public class SearchFragment extends Fragment {
         if (searchRole != null && searchRole.length() > 0)
             query.whereContains(Post.KEY_ROLES, searchRole);
 
-        query.findInBackground(new FindCallback<Post>() {
-            @Override
-            public void done(List<Post> posts, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "issue with getting posts");
-                }
-                for (Post post: posts) {
-                    Log.i(TAG, "Post " + post.getDescription() + " username " + post.getUser().getUsername());
-                }
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(requireContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+            // return;
+        }
+        MapMarker mapMarker = new MapMarker();
+        ParseQuery<Post> finalQuery = query;
+        locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            ParseGeoPoint parseGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                            mapMarker.setLocation(parseGeoPoint);
+                            mapMarker.saveInBackground(e -> {
+                                if (e != null) {
+                                    Log.e(TAG, "Error while saving new map marker!", e);
+                                    Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                                }
+                                Log.i(TAG, "MapMarker save was successful!");
+                                currentLocation = mapMarker ;
+                                Log.i(TAG, "maxdist " + maxDistance);
+                                Log.i(TAG, "current loc " + currentLocation.getLocation().toString());
+                                finalQuery.whereWithinKilometers(Post.KEY_GEOPOINT, currentLocation.getLocation(), maxDistance);
 
-                // save received posts to list and notify adapter of new data
-                allPosts.addAll(posts);
-                adapter.notifyDataSetChanged();
-            }
-        });
+                                finalQuery.findInBackground(new FindCallback<Post>() {
+                                    @Override
+                                    public void done(List<Post> posts, ParseException e) {
+                                        if (e != null) {
+                                            Log.e(TAG, "issue with getting posts");
+                                        }
+                                        Log.i(TAG, "getting posts now!" + posts.size());
+                                        for (Post post: posts) {
+                                            Log.i(TAG, "Post " + post.getDescription() + " username " + post.getUser().getUsername() + " location " + post.getGeoPoint());
+                                        }
+
+                                        // save received posts to list and notify adapter of new data
+                                        allPosts.addAll(posts);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+                            });
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
     }
 
-    private void getColumnArray(Function callback) {
+    private void getColumnArray(QueryResponseCallback callback) {
         ParseQuery<Post> query = ParseQuery.getQuery(Post.class);
         query.include(Post.KEY_USER);
         query.findInBackground(new FindCallback<Post>() {
@@ -256,7 +323,7 @@ public class SearchFragment extends Fragment {
                 }
                 if (posts.size() > 0) {
                     try {
-                        callback.onCalled(posts);
+                        callback.onPostsReturned(posts);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }

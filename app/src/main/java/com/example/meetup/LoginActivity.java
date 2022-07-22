@@ -57,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         setUpGoogleSignIn();
+        if (ParseUser.getCurrentUser() != null) goMainActivity();
         SignInButton googleSignIn = findViewById(R.id.sign_in_button);
 
         Objects.requireNonNull(googleSignIn).setOnClickListener(v -> {

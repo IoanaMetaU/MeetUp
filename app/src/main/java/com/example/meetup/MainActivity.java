@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.example.meetup.Fragments.ComposeFragment;
 import com.example.meetup.Fragments.FeedFragment;
+import com.example.meetup.Fragments.MapsFragment;
 import com.example.meetup.Fragments.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.parse.ParseObject;
@@ -38,10 +39,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_compose:
                         fragment = new ComposeFragment();
                         break;
-//                    TODO create maps/search
-//                    case R.id.action_maps:
-//                        fragment = new MapsFragment();
-//                        break;
+                    case R.id.action_maps:
+                        fragment = new MapsFragment();
+                        break;
                     case R.id.action_search:
                         fragment = new SearchFragment();
                         break;

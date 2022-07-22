@@ -1,15 +1,21 @@
 package com.example.meetup.Fragments;
 
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -22,10 +28,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.meetup.Models.MapMarker;
 import com.example.meetup.Models.Post;
 import com.example.meetup.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -41,13 +54,13 @@ public class ComposeFragment extends Fragment {
 
     private EditText startupNameCompose;
     private EditText categoryCompose;
-    // TODO get maps location private TextView location;
     private EditText captionCompose;
     private EditText descriptionCompose;
     private Button uploadImageCompose;
     private File photoFile;
     private ImageView logoCompose;
     private EditText rolesCompose;
+    private MapMarker locationCompose;
 
     private Button submitCompose;
 
@@ -71,7 +84,6 @@ public class ComposeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         startupNameCompose = view.findViewById(R.id.startupNameCompose);
         categoryCompose = view.findViewById(R.id.categoryCompose);
-        // TODO location = itemView.findViewById(R.id.location);
         captionCompose = view.findViewById(R.id.captionCompose);
         descriptionCompose = view.findViewById(R.id.descriptionCompose);
         rolesCompose = view.findViewById(R.id.rolesCompose);
@@ -89,6 +101,7 @@ public class ComposeFragment extends Fragment {
 
             }
         });
+
         submitCompose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,9 +119,47 @@ public class ComposeFragment extends Fragment {
                     return;
                 }
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                savePost(startupName, description, caption, category, roles, currentUser, photoFile);
+                getLocation(startupName, caption, description, category, roles, currentUser);
             }
         });
+    }
+
+    public void getLocation(String startupName, String caption, String description, String category, String roles, ParseUser currentUser) {
+        MapMarker mapMarker = new MapMarker();
+        mapMarker.setName(startupName);
+
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(requireContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+            // return;
+        }
+        locationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        if (location != null) {
+                            ParseGeoPoint parseGeoPoint = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+                            mapMarker.setLocation(parseGeoPoint);
+                            mapMarker.saveInBackground(e -> {
+                                if (e != null) {
+                                    Log.e(TAG, "Error while saving new map marker!", e);
+                                    Toast.makeText(getActivity(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                                }
+                                Log.i(TAG, "MapMarker save was successful!");
+                                locationCompose = mapMarker ;
+                                savePost(startupName, description, caption, category, roles, currentUser, photoFile, locationCompose, locationCompose.getLocation());
+                            });
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "Error trying to get last GPS location");
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @Override
@@ -158,7 +209,11 @@ public class ComposeFragment extends Fragment {
         }
     }
 
-    private void savePost(String startupName, String description, String caption, String category, String roles, ParseUser currentUser, File photoFile) {
+    public void createMarker(String title, LatLng latLng) {
+
+    }
+
+    private void savePost(String startupName, String description, String caption, String category, String roles, ParseUser currentUser, File photoFile, MapMarker mapMarker, ParseGeoPoint geoPoint) {
         Post post = new Post();
         post.setStartupName(startupName);
         post.setCaption(caption);
@@ -166,6 +221,8 @@ public class ComposeFragment extends Fragment {
         post.setCategory(category);
         post.setUser(currentUser);
         post.setRoles(roles);
+        post.setMapMarker(mapMarker);
+        post.setGeoPoint(geoPoint);
         ParseFile image = new ParseFile(photoFile);
         image.saveInBackground(new SaveCallback() {
             @Override
@@ -196,7 +253,5 @@ public class ComposeFragment extends Fragment {
                 });
             }
         });
-
-
     }
 }

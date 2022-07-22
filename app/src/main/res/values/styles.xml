@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>\
+    <style name="Theme.App" parent="Theme.MaterialComponents.DayNight">
+        ...
+        <item name="colorPrimary">@color/shrine_pink_100</item>
+        <item name="colorSurface">@color/shrine_pink_light</item>
+        <item name="colorOnSurface">@color/shrine_pink_900</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+    </style>
+
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+</resources>
