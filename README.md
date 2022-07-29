@@ -30,18 +30,9 @@ This social media app has the purpose of bringing various project ideas from dif
 * User can create a new account
 * User can login
 * User can post a new startup according to a template
-* User can post updates to their startup
 * User can view a feed of startups
-* User can click and see a detailed description of a startup
 * User can filter according to category
 * User can see map of startups
-
-**Optional Nice-to-have Stories**
-
-* [fill in your required user stories here]
-* User can search for other users and display their startups
-* User can follow/unfollow another user
-* Users can merge startups/add another user as a collaborator
 
 ### 2. Screen Archetypes
 
@@ -51,14 +42,12 @@ This social media app has the purpose of bringing various project ideas from dif
    * User can login
 * Feed
   * User can view a feed of startups
-  * User can click on startup
-* Startup detail
-  * User can click and see a detailed description of a startup
 * Map
   * User can see map with startups
 * Create
   * User can post a new startup according to a template
-  * User can post updates to their startup
+* Filter
+  * User can filter according to name, category, keyword, distance
 
 
 ### 3. Navigation
@@ -66,9 +55,9 @@ This social media app has the purpose of bringing various project ideas from dif
 **Tab Navigation** (Tab to Screen)
 
 * Home Feed
-* Post/edit startup
-* Search user
+* Post startup
 * Filter startups
+* Maps
 
 **Flow Navigation** (Screen to Screen)
 
