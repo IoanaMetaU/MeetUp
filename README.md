@@ -12,6 +12,10 @@ Social media for startups. Users can register their startups and post updates, a
 ### Description
 This social media app has the purpose of bringing various project ideas from different people together. Users post their startup and smaller projects within the startup according to a template. An overview of each startup shows up in other users' feed according to a recommendation algorithm based on user preferences. Users can like/save their favorite startups, collaborate, and merge them (if 2 users have similar ideas and think their startups would perform better together).
 
+
+https://user-images.githubusercontent.com/78447797/181845112-cbeab104-adfd-40cf-8377-baa2c9171da5.mp4
+
+
 ### App Evaluation
 [Evaluation of your app across the following attributes]
 - **Category:** Productivity/Social
